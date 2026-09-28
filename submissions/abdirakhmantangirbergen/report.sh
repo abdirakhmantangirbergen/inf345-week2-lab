@@ -20,11 +20,12 @@ find . -mindepth 1 -type d | wc -l | tr -d ' '
 
 # 3. LARGEST
 echo "LARGEST:"
-find . -type f -exec stat -f "%z %N" {} + 2>/dev/null | sed 's| \./| |' | sort -rn -k1,1 | head -n 3 || true
+find . -type f -exec du -b {} + 2>/dev/null | sed 's|^\./||' | sort -rn -k1,1 | head -n 3 | awk '{print $1 " " $2}' || \
+find . -type f -exec ls -l {} + 2>/dev/null | awk '{print $5 " " $NF}' | sed 's|^\./||' | sort -rn -k1,1 | head -n 3 || true
 
 # 4. EXECUTABLE
 echo "EXECUTABLE:"
-find . -type f -perm +111 | sed 's|^\./||' | sort || true
+find . -type f \( -perm -100 -o -perm -010 -o -perm -001 \) | sed 's|^\./||' | sort || true
 
 # 5. EXTENSIONS
 echo "EXTENSIONS:"
